@@ -10,6 +10,7 @@ export class AppComponent {
   title = 'project';
 
   public toggleDialog: boolean = false;
+  public isActive: boolean = true;
 
   setPort(){
     this.toggleDialog = !this.toggleDialog

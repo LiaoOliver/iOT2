@@ -1,8 +1,6 @@
-<div class="d-flex py-4">
-  <div class="col-8 h-100">
-    <app-tables></app-tables>
-  </div>
-  <form [formGroup]="historyForm" (ngSubmit)="onSubmit()" class="col-4">
+<div class="d-flex flex-column py-4">
+  
+  <form [formGroup]="historyForm" (ngSubmit)="onSubmit()" class="col-12">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text" id="basic-addon1">Serial Number</span>
@@ -23,4 +21,8 @@
     </div>
     <button type="submit" class="btn btn-primary" [disabled]="!historyForm.valid">送出查詢</button>
   </form>
+
+  <div class="col-12">
+    <app-tables></app-tables>
+  </div>
 </div>
