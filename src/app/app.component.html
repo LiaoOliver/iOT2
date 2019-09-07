@@ -1,0 +1,29 @@
+<div class="w-100 p-3 bg-light d-flex justify-content-around">
+  <a [routerLink]="['/']">
+    <img width="36" src="../assets/icons/24px.svg">
+  </a>
+  <a [routerLink]="['/history']">
+    <img width="36" src="../assets/icons/history-solid.svg">
+  </a>
+  <a (click)="setPort()">
+    <img width="36" src="../assets/icons/cog-solid.svg">
+  </a>
+</div>
+<div class="content">
+  <router-outlet></router-outlet>
+</div>
+
+<div *ngIf="toggleDialog">
+  <div class="dialog"></div>
+  <div class="setting ">
+    <form [formGroup]="form" class="d-flex flex-column">
+      <label>請設定 COM-PORT</label>
+      <select>
+        <option>A</option>
+        <option>B</option>
+        <option>C</option>
+      </select>
+      <button type="button" class="btn btn-primary mt-3" (click)="setPort()">確定</button>
+    </form>
+  </div>
+</div>

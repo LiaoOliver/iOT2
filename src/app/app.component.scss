@@ -1,0 +1,30 @@
+a{
+    cursor: pointer;
+}
+
+.content{
+    height: calc(100vh - 68px);
+}
+
+
+.dialog{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #000;
+    opacity: 0.5;
+}
+
+.setting{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9;
+    width: 30%;
+    padding: 16px;
+    border-radius: 6px;
+    background: #fff;
+}

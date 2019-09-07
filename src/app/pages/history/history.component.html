@@ -1,0 +1,26 @@
+<div class="d-flex py-4">
+  <div class="col-8 h-100">
+    <app-tables></app-tables>
+  </div>
+  <form [formGroup]="historyForm" (ngSubmit)="onSubmit()" class="col-4">
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">Serial Number</span>
+      </div>
+      <input required type="text" class="form-control" formControlName="number">
+    </div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">開始時間</span>
+      </div>
+      <input required type="date" class="form-control" formControlName="startDate">
+    </div>
+    <div class="input-group mb-3">
+      <div class="input-group-prepend">
+        <span class="input-group-text" id="basic-addon1">結束時間</span>
+      </div>
+      <input required type="date" class="form-control" formControlName="endDate">
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="!historyForm.valid">送出查詢</button>
+  </form>
+</div>
