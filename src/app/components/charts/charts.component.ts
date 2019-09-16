@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import * as io from 'socket.io-client';
 
 @Component({
   selector: 'app-charts',
@@ -9,110 +10,124 @@ export class ChartsComponent implements OnInit {
 
   options: any;
   updateOptions: any;
-
-  private oneDay = 24 * 3600 * 1000;
-  private now: Date;
-  private value: number ;
-  private data: any[];
-  private data1 : any[];
+  private target;
   private timer: any;
+  private socket;
+  private rpm = [];
+  private torque = [];
+  private reStart = true;
 
-  constructor() { }
+  @Input() isConnect;
+  @Input() info;
+  @Output() sendLog = new EventEmitter();
+
+  constructor() {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if(this.isConnect){
+      this.target = this.info.target;
+      this.socket = io.connect('http://10.101.100.179:5001', {
+        transports: ['polling']
+      });
+      this.listenSocket()
+    }
+  }
 
   ngOnInit() {
-    // generate some random testing data:
-    this.data = [];
-    this.data1 = [];
-    this.now = new Date(1997, 9, 3);
-    this.value = Math.random() * 1000;
-
-    for (let i = 0; i < 1000; i++) {
-      this.data.push(this.randomData());
-      
-    }
+    this.drawChart();
     
+  }
+
+  listenSocket(){
+    let socket = this.socket
+    let _this = this;
+    this.socket.on('data', function(data){
+      console.log('on', this.reStart)
+      if(this.reStart){
+        this.rpm = [];
+        this.torque = [];
+        this.drawChart();
+      }
+      _this.update(data, this.target)
+
+    })
+  }
+
+  update(data, target){
+    if(data.snDirection === 1) return;
+    this.rpm.push(data.nRPM)
+    this.torque.push(data.nTorque)
+    this.updateOptions = {
+      series:[
+        {
+					type: 'line',
+					stack: '轉速',
+					smooth: true,
+          data: this.rpm,
+          
+				},
+				{
+					type: 'line',
+					stack: '扭力',
+					smooth: true,
+          data: this.torque,
+          // markLine: {
+            //   data: { yAxis:target, name: '扭力目標值'}
+            // }
+          },
+        ]
+      }
+      if(data.snStatus){
+        this.sendLog.emit(data);
+        this.reStart = true;
+        console.log('ochangen', this.reStart)
+        return;
+      }
+      
+      this.reStart = false;
+      console.log('end', this.reStart)
+  }
+
+  drawChart(data = []) {
     // initialize chart options:
     this.options = {
       tooltip: {
         trigger: 'axis',
-        formatter: (params) => {
-          params = params[0];
-          let date = new Date(params.name);
-          return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' : ' + params.value[1];
-        },
-        axisPointer: {
-          animation: false
+        formatter: function (params) {
+          return "RPM: " + params[0]['data'].toFixed(2) + '<br>' + "Torque: " + params[1]['data'].toFixed(2);
         }
       },
       xAxis: {
-        type: 'time',
-        splitLine: {
-          show: false
-        }
+        type: 'category',
+        data: []
       },
       yAxis: [
         {
-
           type: 'value',
-          boundaryGap: [0, '100%'],
-          splitLine: {
-            show: false
+          name: '轉速',
+          // min: 0,
+          // max: 500,
+          // interval: 100,
+          axisLabel: {
+            formatter: '{value} rpm'
           }
         },
         {
-          
           type: 'value',
-          boundaryGap: [0, '100%'],
-          position:'right',
-          splitLine: {
-            show: false
+          name: '扭力',
+          // min: 0,
+          // max: 50,
+          // interval: 5,
+          axisLabel: {
+            formatter: '{value}'
           }
         }
       ],
-      series: [
-        {
-          name: 'Mocking Data',
-          type: 'line',
-          showSymbol: false,
-          hoverAnimation: false,
-          data: this.data
-        }
-      ]
+      series: []
     };
-
-    // Mock dynamic data:
-    this.timer = setInterval(() => {
-      for (let i = 0; i < 5; i++) {
-        this.data.shift();
-        this.data.push(this.randomData());
-      }
-
-      // update series data:
-      this.updateOptions = {
-        series: [
-          {
-            data: this.data
-          }
-        ]
-      };
-    }, 1000);
   }
 
   ngOnDestroy() {
     clearInterval(this.timer);
   }
-
-  randomData() {
-    this.now = new Date(this.now.getTime() + this.oneDay);
-    this.value = this.value + Math.random() * 21 - 10;
-    return {
-      name: this.now.toString(),
-      value: [
-        [this.now.getFullYear(), this.now.getMonth() + 1, this.now.getDate()].join('/'),
-        Math.round(this.value)
-      ]
-    };
-  }
-
-
 }

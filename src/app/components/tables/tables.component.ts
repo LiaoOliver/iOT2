@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-tables',
@@ -7,9 +7,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TablesComponent implements OnInit {
 
+  @Input() data;
+
   constructor() { }
 
   ngOnInit() {
+
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(this.data)
   }
 
 }

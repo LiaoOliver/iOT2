@@ -1,5 +1,6 @@
 import { FormGroup, FormControl } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-history',
@@ -9,18 +10,28 @@ import { Component, OnInit } from '@angular/core';
 export class HistoryComponent implements OnInit {
 
   public historyForm = new FormGroup({
-    number: new FormControl(''),
+    serialNumber: new FormControl(''),
     startDate: new FormControl(''),
     endDate: new FormControl('')
   })
+  public tableList;
+  public lists: string[] = []
 
-  constructor() { }
+  constructor(
+    private _http:HttpClient
+  ) { }
 
   ngOnInit() {
+    this._http.get('http://10.101.100.179:5001/screwdrive/data/serialNum').subscribe((res:any) => {
+      this.lists = res.result
+    })
   }
 
   onSubmit(){
-    console.log(this.historyForm.value)
+    let payload = this.historyForm.value
+    this._http.post('http://10.101.100.179:5001/screwdrive/data/interval', payload).subscribe((res:any) => {
+      this.tableList = res.result;
+    })
   }
 
 }

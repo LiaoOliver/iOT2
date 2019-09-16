@@ -5,7 +5,10 @@
       <div class="input-group-prepend">
         <span class="input-group-text" id="basic-addon1">Serial Number</span>
       </div>
-      <input required type="text" class="form-control" formControlName="number">
+      <select required formControlName="serialNumber" class="form-control">
+        <option value="">請選擇</option>
+        <option *ngFor="let list of lists" [value]="list">{{ list }}</option>
+      </select>
     </div>
     <div class="input-group mb-3">
       <div class="input-group-prepend">
@@ -23,6 +26,6 @@
   </form>
 
   <div class="col-12">
-    <app-tables></app-tables>
+    <app-tables [data]="tableList"></app-tables>
   </div>
 </div>

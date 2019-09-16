@@ -1,9 +1,9 @@
 <div class="d-flex flex-column h-100 overflow-auto">
   <div class="d-flex h-50">
     <div class="col-8 p-4">
-      <app-charts></app-charts>
+      <app-charts [isConnect]="isSubmit" [info]="info" (sendLog)="showLog($event)"></app-charts>
     </div>
-    <form [formGroup]="basicForm" class="col-4 p-4">
+    <form [formGroup]="basicForm" (ngSubmit)="onSubmit()"  class="col-4 p-4">
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon1">Serial Number</span>
@@ -14,15 +14,15 @@
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon1">目標扭力值</span>
         </div>
-        <input type="text" class="form-control" formControlName="target">
+        <input required type="text" class="form-control" formControlName="target">
       </div>
       <div class="d-flex justify-content-around">
-        <button type="button" class="btn btn-info" [disabled]="basicForm.value">開始</button>
+        <button type="submit" class="btn btn-info" [disabled]="!basicForm.valid">開始</button>
         <button type="button" class="btn btn-warning">中止</button>
       </div>
     </form>
   </div>
   <div class="h-50">
-    <app-tables></app-tables>
+    <app-tables [data]="tableReport"></app-tables>
   </div>
 </div>

@@ -8,6 +8,9 @@ import { FormGroup, FormControl } from '@angular/forms';
 })
 export class RealtimeComponent implements OnInit {
 
+  public tableReport = [];
+  public isSubmit = false;
+  public info;
   public basicForm =  new FormGroup({
     number: new FormControl(''),
     target: new FormControl('')
@@ -16,6 +19,16 @@ export class RealtimeComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+  }
+
+  onSubmit(){
+    this.isSubmit = true;
+    this.info = this.basicForm.value;
+  }
+
+  showLog(e){
+    this.tableReport.push(e)
+    console.log("showLog:",e)
   }
 
 }

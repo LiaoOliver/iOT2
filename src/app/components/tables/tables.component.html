@@ -1,5 +1,6 @@
 <table id="table-data" class="h-100">
     <tr>
+      <th>Time</th>
       <th>ElapsedTime</th>
       <th>RPM</th>
       <th>ScrewLeft</th>
@@ -20,88 +21,27 @@
       <th>Temperature</th>
       <th>TorqueUnit</th>
     </tr>
-    <tr>
-      <td>ElapsedTime</td>
-      <td>RPM</td>
-      <td>ScrewLeft</td>
-      <td>Station</td>
-      <td>TightAglLowerLmt</td>
-      <td>TightAglUpperLmt</td>
-      <td>TightAngle</td>
-      <td>Torque</td>
-      <td>TorqueLowerLmt</td>
-      <td>TorqueUpperLmt</td>
-      <td>TotalAglLowerLmt</td>
-      <td>TotalAglUpperLmt</td>
-      <td>TotalAngle</td>
-      <td>Direction</td>
-      <td>Finish</td>
-      <td>Report</td>
-      <td>Status</td>
-      <td>Temperature</td>
-      <td>TorqueUnit</td>
-    </tr>
-    <tr>
-      <td>ElapsedTime</td>
-      <td>RPM</td>
-      <td>ScrewLeft</td>
-      <td>Station</td>
-      <td>TightAglLowerLmt</td>
-      <td>TightAglUpperLmt</td>
-      <td>TightAngle</td>
-      <td>Torque</td>
-      <td>TorqueLowerLmt</td>
-      <td>TorqueUpperLmt</td>
-      <td>TotalAglLowerLmt</td>
-      <td>TotalAglUpperLmt</td>
-      <td>TotalAngle</td>
-      <td>Direction</td>
-      <td>Finish</td>
-      <td>Report</td>
-      <td>Status</td>
-      <td>Temperature</td>
-      <td>TorqueUnit</td>
-    </tr>
-    <tr>
-      <td>ElapsedTime</td>
-      <td>RPM</td>
-      <td>ScrewLeft</td>
-      <td>Station</td>
-      <td>TightAglLowerLmt</td>
-      <td>TightAglUpperLmt</td>
-      <td>TightAngle</td>
-      <td>Torque</td>
-      <td>TorqueLowerLmt</td>
-      <td>TorqueUpperLmt</td>
-      <td>TotalAglLowerLmt</td>
-      <td>TotalAglUpperLmt</td>
-      <td>TotalAngle</td>
-      <td>Direction</td>
-      <td>Finish</td>
-      <td>Report</td>
-      <td>Status</td>
-      <td>Temperature</td>
-      <td>TorqueUnit</td>
-    </tr>
-    <tr>
-      <td>ElapsedTime</td>
-      <td>RPM</td>
-      <td>ScrewLeft</td>
-      <td>Station</td>
-      <td>TightAglLowerLmt</td>
-      <td>TightAglUpperLmt</td>
-      <td>TightAngle</td>
-      <td>Torque</td>
-      <td>TorqueLowerLmt</td>
-      <td>TorqueUpperLmt</td>
-      <td>TotalAglLowerLmt</td>
-      <td>TotalAglUpperLmt</td>
-      <td>TotalAngle</td>
-      <td>Direction</td>
-      <td>Finish</td>
-      <td>Report</td>
-      <td>Status</td>
-      <td>Temperature</td>
-      <td>TorqueUnit</td>
+    <tr *ngFor="let item of data">
+      <td>{{ item.time | date:'short' }}</td>
+      <td>{{ item.nElapsedTime }}</td>
+      <td>{{ item.nRPM }}</td>
+      <td>{{ item.nScrewLeft }}</td>
+      <td>{{ item.nStation }}</td>
+      <td>{{ item.nTightAglLowerLmt }}</td>
+      <td>{{ item.nTightAglUpperLmt }}</td>
+      <td>{{ item.nTightAngle }}</td>
+      <td>{{ item.nTorque }}</td>
+      <td>{{ item.nTorqueLowerLmt }}</td>
+      <td>{{ item.nTorqueUpperLmt }}</td>
+      <td>{{ item.nTotalAglLowerLmt }}</td>
+      <td>{{ item.nTotalAglUpperLmt }}</td>
+      <td>{{ item.nTotalAngle }}</td>
+      <td>{{ item.snDirection }}</td>
+      <td>{{ item.snFinish }}</td>
+      <td>{{ item.snReport }}</td>
+      <td>{{ item.snStatus }}</td>
+      <td>{{ item.snTemperature }}</td>
+      <td>{{ item.snTorqueUnit }}</td>
     </tr>
   </table>
+
