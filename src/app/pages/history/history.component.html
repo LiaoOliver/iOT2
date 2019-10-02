@@ -1,5 +1,7 @@
 <div class="d-flex flex-column py-4">
-  
+  <div class="alert alert-danger col-4 position-absolute" role="alert" *ngIf="noDataAlert">
+    此區間查無資料
+  </div>
   <form [formGroup]="historyForm" (ngSubmit)="onSubmit()" class="col-12">
     <div class="input-group mb-3">
       <div class="input-group-prepend">

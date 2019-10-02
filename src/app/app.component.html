@@ -1,18 +1,25 @@
+<ngx-loading [show]="!isWait" [config]="{primaryColour: '#FFD25A', secondaryColour: '#FFAA5A', tertiaryColour: '#FF785A', backdropBackgroundColour: 'rgba(0,0,0,0.8)'}"></ngx-loading>
 <div class="w-100 p-3 bg-light d-flex justify-content-around">
-  <div class="col-4 text-center position-relative" (click)="isActive = 0">
+  <div class="col-3 text-center position-relative" (click)="isActive = 0">
     <a [routerLink]="['/']" class="ishover d-inline-block">
       <img width="36" src="assets/icons/24px.svg">
     </a>
     <span [ngClass]="{bottomLine: isActive === 0}"></span>
   </div>
-  <div class="col-4 text-center" (click)="isActive = 1">
+  <div class="col-3 text-center" (click)="isActive = 1" [ngClass]="{'isDisabled': desabled}">
     <a [routerLink]="['/history']" class="ishover d-inline-block">
       <img width="36" src="assets/icons/history-solid.svg">
     </a>
     <span [ngClass]="{bottomLine: isActive === 1}"></span>
   </div>
-  <div class="col-4 text-center ishover">
-    <a (click)="setPort()">
+  <div class="col-3 text-center" (click)="isActive = 2" [ngClass]="{'isDisabled': desabled}">
+    <a [routerLink]="['/delete']" class="ishover d-inline-block">
+      <img width="36" src="assets/icons/trash.svg">
+    </a>
+    <span [ngClass]="{bottomLine: isActive === 2}"></span>
+  </div>
+  <div class="col-3 text-center ishover" [ngClass]="{'isDisabled': desabled}">
+    <a (click)="openSetPort()">
       <img width="36" src="assets/icons/cog-solid.svg">
     </a>
   </div>
@@ -24,6 +31,7 @@
 <div *ngIf="toggleDialog">
   <div class="dialog"></div>
   <div class="setting ">
+    <span class="closebtn" (click)="close()">X</span>
     <form [formGroup]="selectedComPortForm" (ngSubmit)="setPort()" class="d-flex flex-column">
       <label>請設定 COM-PORT</label>
       <select formControlName="selected">

@@ -3,6 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { RealtimeComponent } from './pages/realtime/realtime.component';
 import { HistoryComponent } from './pages/history/history.component';
+import { DeleteComponent } from './pages/delete/delete.component';
+
 
 const routes: Routes = [
   {
@@ -14,13 +16,22 @@ const routes: Routes = [
     component:HistoryComponent
   },
   {
+    path: "delete",
+    component:DeleteComponent
+  },
+  {
     path:"**",
     component:RealtimeComponent
   }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+   imports: [
+      RouterModule.forRoot(routes)
+   ],
+   exports: [
+      RouterModule
+   ],
+
 })
 export class AppRoutingModule { }

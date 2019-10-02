@@ -1,4 +1,6 @@
 import { Component, OnInit, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { StatusManagmentService } from '../../service/statusManagment.service';
 import * as io from 'socket.io-client';
 
 @Component({
@@ -15,82 +17,122 @@ export class ChartsComponent implements OnInit {
   private socket;
   private rpm = [];
   private torque = [];
-  private reStart = true;
+  private preStatus: number;
+  private curStatus: number;
 
-  @Input() isConnect;
+  @Input() isConnect: boolean;
   @Input() info;
+  @Input() stopAndReset: boolean;
   @Output() sendLog = new EventEmitter();
+  @Output() finished = new EventEmitter(false);
 
-  constructor() {}
+  constructor(
+    private _http: HttpClient,
+    private _state: StatusManagmentService
+  ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(this.isConnect){
+    if (this.isConnect) {
       this.target = this.info.target;
-      this.socket = io.connect('http://10.101.100.179:5001', {
+      this.socket = io.connect('http://localhost:5001', {
         transports: ['polling']
       });
       this.listenSocket()
+    }
+    if (this.stopAndReset) {
+      this.sendLog.emit({message:'reset'});
+      this.drawChart();
     }
   }
 
   ngOnInit() {
     this.drawChart();
-    
   }
 
-  listenSocket(){
+  listenSocket() {
     let socket = this.socket
     let _this = this;
-    this.socket.on('data', function(data){
-      console.log('on', this.reStart)
-      if(this.reStart){
-        this.rpm = [];
-        this.torque = [];
-        this.drawChart();
+    this._state.connectSuccess.next(true);
+    // alert("連線成功！請開始操作！");
+    this.socket.on('data', function (data) {
+      this.preStatus = this.curStatus;
+      this.curStatus = data.snStatus;
+      if ((this.preStatus == 1 && this.curStatus == 0) || (this.preStatus == 2 && this.curStatus == 0)) {
+        _this.rpm = [];
+        _this.torque = [];
+        _this.drawChart();
       }
       _this.update(data, this.target)
 
     })
+
   }
 
-  update(data, target){
-    if(data.snDirection === 1) return;
+  // update data 
+  update(data, target) {
+    if (data.snDirection === 1) return;
     this.rpm.push(data.nRPM)
     this.torque.push(data.nTorque)
     this.updateOptions = {
-      series:[
+      series: [
         {
-					type: 'line',
-					stack: '轉速',
-					smooth: true,
+          name: '轉速',
+          type: 'line',
+          stack: '轉速',
+          smooth: true,
           data: this.rpm,
-          
-				},
-				{
-					type: 'line',
-					stack: '扭力',
-					smooth: true,
+        },
+        {
+          name: '扭力',
+          type: 'line',
+          stack: '扭力',
+          smooth: true,
           data: this.torque,
-          // markLine: {
-            //   data: { yAxis:target, name: '扭力目標值'}
-            // }
-          },
-        ]
+          markLine: {
+            data: [
+              {
+                yAxis: this.target,
+                name: '目標值'
+              }
+            ]
+          }
+        },
+      ]
+    }
+    if (data.snStatus) {
+      this.sendLog.emit(data);
+      let payload = {
+        serialNumber: this.info.number,
+        data:data
       }
-      if(data.snStatus){
-        this.sendLog.emit(data);
-        this.reStart = true;
-        console.log('ochangen', this.reStart)
-        return;
+      console.log(payload)
+      this._http.post('http://localhost:5001/screwdrive/data/write2csv', payload).subscribe(
+      res => {
+        console.log("success")
+      })
+      console.log(data.nScrewLeft)
+      if (!data.nScrewLeft) {
+        this.socket.close();
+        this.finished.emit(true)
+        this._state.finishedAlert.next(true);
       }
-      
-      this.reStart = false;
-      console.log('end', this.reStart)
+      return;
+    }
   }
 
+  // basic chart condition
   drawChart(data = []) {
-    // initialize chart options:
     this.options = {
+      legend: {
+        type: 'scroll',
+        data: [{
+          name: '轉速',
+          icon: 'rect'
+        }, {
+          name: '扭力',
+          icon: 'rect'
+        }]
+      },
       tooltip: {
         trigger: 'axis',
         formatter: function (params) {
@@ -105,9 +147,6 @@ export class ChartsComponent implements OnInit {
         {
           type: 'value',
           name: '轉速',
-          // min: 0,
-          // max: 500,
-          // interval: 100,
           axisLabel: {
             formatter: '{value} rpm'
           }
@@ -115,15 +154,20 @@ export class ChartsComponent implements OnInit {
         {
           type: 'value',
           name: '扭力',
-          // min: 0,
-          // max: 50,
-          // interval: 5,
+          min: 0,
+          max: 100,
+          interval: 20,
+          splitLine: {
+            show: false
+          },
           axisLabel: {
             formatter: '{value}'
           }
         }
       ],
-      series: []
+      series: [
+
+      ]
     };
   }
 

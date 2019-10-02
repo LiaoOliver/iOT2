@@ -1,24 +1,35 @@
 <div class="d-flex flex-column h-100 overflow-auto">
+  <div class="alert alert-danger col-4 position-absolute" role="alert" *ngIf="stopAlert">
+    連線中斷
+  </div>
+  <div class="alert alert-success col-4 position-absolute" role="alert" *ngIf="showConnectAlert">
+    開始連線
+  </div>
+  <div class="alert alert-success col-4 position-absolute" role="alert" *ngIf="finishedAlert">
+    作業已完成，請按重置後在進行下一輪作業
+  </div>
   <div class="d-flex h-50">
     <div class="col-8 p-4">
-      <app-charts [isConnect]="isSubmit" [info]="info" (sendLog)="showLog($event)"></app-charts>
+      <app-charts [isConnect]="isConnect" [info]="info" [stopAndReset]="stopAndReset" (sendLog)="showLog($event)"
+        (finished)="ableReset()"></app-charts>
     </div>
-    <form [formGroup]="basicForm" (ngSubmit)="onSubmit()"  class="col-4 p-4">
+    <form [formGroup]="basicForm" (ngSubmit)="onSubmit()" class="col-4 p-4">
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon1">Serial Number</span>
         </div>
-        <input required type="text" class="form-control" formControlName="number">
+        <input required type="text" class="form-control" formControlName="number" #inputFoucs>
       </div>
       <div class="input-group mb-3">
         <div class="input-group-prepend">
           <span class="input-group-text" id="basic-addon1">目標扭力值</span>
         </div>
-        <input required type="text" class="form-control" formControlName="target">
+        <input required type="number" class="form-control" formControlName="target">
       </div>
       <div class="d-flex justify-content-around">
-        <button type="submit" class="btn btn-info" [disabled]="!basicForm.valid">開始</button>
-        <button type="button" class="btn btn-warning">中止</button>
+        <button type="submit" class="btn btn-info" *ngIf="toggleBtn" [disabled]="!basicForm.valid">開始連線</button>
+        <button type="submit" class="btn btn-danger" *ngIf="!toggleBtn" (click)="stopConnect($event)">中止連線</button>
+        <button type="button" class="btn btn-warning" (click)="reset()" [disabled]="enabledReset">重置</button>
       </div>
     </form>
   </div>

@@ -1,0 +1,23 @@
+<div class="col-12">
+  <div class="input-group my-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text" id="basic-addon1">Serial Number</span>
+    </div>
+    <select required class="form-control" (change)="getfile($event)">
+      <option value="">請選擇</option>
+      <option *ngFor="let list of lists" [value]="list">{{ list }}</option>
+    </select>
+  </div>
+
+
+  <ul class="list-group" >
+    <li *ngFor="let flie of historyFile" class="list-group-item">
+      <input type="checkbox" (change)="addDeleteList(flie)">
+      <span class="ml-3">{{ flie }}</span>
+    </li>
+  </ul>
+  <div *ngIf="historyFile.length" class=" mt-3">
+    <button class="btn btn-danger" (click)="activeDel()">刪除</button>
+    <button class="btn btn-warning ml-3" (click)="deleteAll()">全部刪除(包含serial number)</button>
+  </div>
+</div>
