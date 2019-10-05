@@ -25,7 +25,7 @@ export class HistoryComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this._http.get('http://localhost:5001/screwdrive/data/serialNum').subscribe((res:any) => {
+    this._http.get('http://10.101.100.179:5001/screwdrive/data/serialNum').subscribe((res:any) => {
       console.log(res)
       if(res.result === null || !res.result.length) return this.lists = ['尚未有資料'];
       this.lists = res.result
@@ -36,7 +36,7 @@ export class HistoryComponent implements OnInit {
 
   onSubmit(){
     let payload = this.historyForm.value
-    this._http.post('http://localhost:5001/screwdrive/data/interval', payload).subscribe((res:any) => {
+    this._http.post('http://10.101.100.179:5001/screwdrive/data/interval', payload).subscribe((res:any) => {
       if(!res.result.length){
         this.noDataAlert = true;
         setTimeout(()=>{

@@ -1,4 +1,4 @@
-<ngx-loading [show]="!isWait" [config]="{primaryColour: '#FFD25A', secondaryColour: '#FFAA5A', tertiaryColour: '#FF785A', backdropBackgroundColour: 'rgba(0,0,0,0.8)'}"></ngx-loading>
+<ngx-loading [show]="isWait" [config]="{primaryColour: '#FFD25A', secondaryColour: '#FFAA5A', tertiaryColour: '#FF785A', backdropBackgroundColour: 'rgba(0,0,0,0.8)'}"></ngx-loading>
 <div class="w-100 p-3 bg-light d-flex justify-content-around">
   <div class="col-3 text-center position-relative" (click)="isActive = 0">
     <a [routerLink]="['/']" class="ishover d-inline-block">

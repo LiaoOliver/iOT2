@@ -23,7 +23,7 @@ export class DeleteComponent implements OnInit {
   }
 
   init() {
-    this._http.get('http://localhost:5001/screwdrive/data/serialNum').subscribe((res: any) => {
+    this._http.get('http://10.101.100.179:5001/screwdrive/data/serialNum').subscribe((res: any) => {
       this.lists = res.result
     })
   }
@@ -34,7 +34,7 @@ export class DeleteComponent implements OnInit {
   }
 
   getData() {
-    this._http.get(`http://localhost:5001/screwdrive/data/history/${this.name}`).subscribe((res: any) => {
+    this._http.get(`http://10.101.100.179:5001/screwdrive/data/history/${this.name}`).subscribe((res: any) => {
       this.historyFile = res.result[0]
     })
   }
@@ -62,7 +62,7 @@ export class DeleteComponent implements OnInit {
       }),
       body: payload
     }
-    this._http.delete('http://localhost:5001/screwdrive/data/delete', options).subscribe(res => {
+    this._http.delete('http://10.101.100.179:5001/screwdrive/data/delete', options).subscribe(res => {
       if(this.all){
         this.ngOnInit();
         this.lists = [];

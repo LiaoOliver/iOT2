@@ -12,8 +12,8 @@
 
   <ul class="list-group" >
     <li *ngFor="let flie of historyFile" class="list-group-item">
-      <input type="checkbox" (change)="addDeleteList(flie)">
-      <span class="ml-3">{{ flie }}</span>
+      <input type="checkbox" (change)="addDeleteList(flie)" [id]="flie">
+      <label [for]="file" class="ml-3">{{ flie }}</label>
     </li>
   </ul>
   <div *ngIf="historyFile.length" class=" mt-3">

@@ -42,7 +42,7 @@ export class AppComponent implements OnInit {
   }
 
   checkConnect(){
-    this._http.get('http://localhost:5001/screwdrive/heartbeat').subscribe((res:any) => {
+    this._http.get('http://10.101.100.179:5001/screwdrive/heartbeat').subscribe((res:any) => {
       this.isWait = res.result
       if(res.result){
         this.checkComPortStatus();
@@ -63,11 +63,11 @@ export class AppComponent implements OnInit {
   setPort(){
     let port = this.selectedComPortForm.value['selected']
     this.toggleDialog = !this.toggleDialog;
-    this._http.post('http://localhost:5001/screwdrive/com/setPortNum ', {"port":port}).subscribe(
+    this._http.post('http://10.101.100.179:5001/screwdrive/com/setPortNum ', {"port":port}).subscribe(
       (res:any) => {
         if(res.result === 'Successful'){
           this._status.focus.next(true);
-          this._http.post('http://localhost:5001/screwdrive/com/open', {"open": true }).subscribe(res => {
+          this._http.post('http://10.101.100.179:5001/screwdrive/com/open', {"open": true }).subscribe(res => {
             this.checkComPortStatus()
           },err =>{
             console.log(err)
@@ -78,7 +78,7 @@ export class AppComponent implements OnInit {
   }
 
   checkComPortStatus(){
-    this._http.get('http://localhost:5001/screwdrive/com/status').subscribe((res:any)=>{
+    this._http.get('http://10.101.100.179:5001/screwdrive/com/status').subscribe((res:any)=>{
       if(!res.result){
         // alert('請先設定 COM PORT');
         this.toggleDialog = !this.toggleDialog;
@@ -87,7 +87,7 @@ export class AppComponent implements OnInit {
   }
 
   getComPort(){
-    this._http.get('http://localhost:5001/screwdrive/com/info').subscribe((res:any) => {
+    this._http.get('http://10.101.100.179:5001/screwdrive/com/info').subscribe((res:any) => {
       this.comPortList = res.result;
     })
   }

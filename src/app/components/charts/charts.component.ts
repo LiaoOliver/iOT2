@@ -34,7 +34,7 @@ export class ChartsComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (this.isConnect) {
       this.target = this.info.target;
-      this.socket = io.connect('http://localhost:5001', {
+      this.socket = io.connect('http://10.101.100.179:5001', {
         transports: ['polling']
       });
       this.listenSocket()
@@ -53,7 +53,6 @@ export class ChartsComponent implements OnInit {
     let socket = this.socket
     let _this = this;
     this._state.connectSuccess.next(true);
-    // alert("連線成功！請開始操作！");
     this.socket.on('data', function (data) {
       this.preStatus = this.curStatus;
       this.curStatus = data.snStatus;
@@ -63,7 +62,6 @@ export class ChartsComponent implements OnInit {
         _this.drawChart();
       }
       _this.update(data, this.target)
-
     })
 
   }
@@ -83,6 +81,7 @@ export class ChartsComponent implements OnInit {
           data: this.rpm,
         },
         {
+          yAxisIndex:1,
           name: '扭力',
           type: 'line',
           stack: '扭力',
@@ -105,12 +104,11 @@ export class ChartsComponent implements OnInit {
         serialNumber: this.info.number,
         data:data
       }
-      console.log(payload)
-      this._http.post('http://localhost:5001/screwdrive/data/write2csv', payload).subscribe(
-      res => {
+      
+      this._http.post('http://10.101.100.179:5001/screwdrive/data/write2csv', payload)
+      .subscribe(res => {
         console.log("success")
       })
-      console.log(data.nScrewLeft)
       if (!data.nScrewLeft) {
         this.socket.close();
         this.finished.emit(true)
@@ -152,6 +150,7 @@ export class ChartsComponent implements OnInit {
           }
         },
         {
+          id:1,
           type: 'value',
           name: '扭力',
           min: 0,
