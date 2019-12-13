@@ -11,15 +11,18 @@ import * as io from 'socket.io-client';
 export class ChartsComponent implements OnInit {
 
   options: any;
-  updateOptions: any;
-  private target;
+  public updateOptions: any;
   private timer: any;
   private socket;
   private rpm = [];
   private torque = [];
-  private preStatus: number;
-  private curStatus: number;
+  private time = [];
+  private preStatus: number = 0;
+  private curStatus: number = 0;
+  public showbar;
+  public showbarobj;
 
+  @Input() closeStocket: boolean = false;
   @Input() isConnect: boolean;
   @Input() info;
   @Input() stopAndReset: boolean;
@@ -32,15 +35,24 @@ export class ChartsComponent implements OnInit {
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (this.closeStocket) {
+      this.socket.disconnect();
+      this._http.post('http://localhost:5001/screwdrive/device/disable', { "disable": true }).subscribe(res => {
+        // console.log("success")
+      })
+      setTimeout(() => {
+        this.closeStocket = false;
+      }, 1000);
+    }
     if (this.isConnect) {
-      this.target = this.info.target;
-      this.socket = io.connect('http://10.101.100.179:5001', {
-        transports: ['polling']
-      });
-      this.listenSocket()
+      this.socket = io.connect('http://localhost:5001', { transports: ['polling'] });
+      this.listenSocket();
     }
     if (this.stopAndReset) {
-      this.sendLog.emit({message:'reset'});
+      this.sendLog.emit({ message: 'reset' });
+      this.rpm = [];
+      this.time = [];
+      this.torque = [];
       this.drawChart();
     }
   }
@@ -50,69 +62,125 @@ export class ChartsComponent implements OnInit {
   }
 
   listenSocket() {
-    let socket = this.socket
     let _this = this;
     this._state.connectSuccess.next(true);
-    this.socket.on('data', function (data) {
-      this.preStatus = this.curStatus;
-      this.curStatus = data.snStatus;
-      if ((this.preStatus == 1 && this.curStatus == 0) || (this.preStatus == 2 && this.curStatus == 0)) {
-        _this.rpm = [];
-        _this.torque = [];
-        _this.drawChart();
+    this.socket.on('data', function (data: any) {
+      _this.preStatus = _this.curStatus;
+      _this.curStatus = data.snStatus;
+      // 每執行完一顆螺絲 重設
+      if ((_this.preStatus == 0 && _this.curStatus == 1) || (_this.preStatus == 0 && _this.curStatus == 2)) {
+        _this.clearChart()
+        return;
       }
-      _this.update(data, this.target)
+      _this.update(data)
     })
+  }
 
+  clearChart(data = []) {
+    this.rpm = [];
+    this.torque = [];
+    this.time = [];
+    this.drawChart();
+    this.update(data)
   }
 
   // update data 
-  update(data, target) {
-    if (data.snDirection === 1) return;
-    this.rpm.push(data.nRPM)
-    this.torque.push(data.nTorque)
+  update(data) {
+    // 倒轉 跳出 update
+    if (data.snDirection === 1) {
+      // close remindError window
+      this._state.openRemindError.next({ isOpen: false, message: "" });
+      // reset
+      return this._state.resetIndex();
+    }
+    if (data.nRPM === undefined) return;
+
+    if(data.snTorqueUnit === 0) {
+      data.nTorque = (parseFloat(data.nTorque)/100).toFixed(2);
+    }
+    if(data.snTorqueUnit === 1) {
+      data.nTorque = (parseInt(data.nTorque) / 1000).toFixed(2);
+    }
+
+    let time = data.timeStamp * 1000;
+    this.time.push(time);
+    this.rpm.push(data.nRPM);
+    this.torque.push(data.nTorque);
     this.updateOptions = {
+      xAxis: {
+        type: 'category',
+        data: this.time,
+        splitNumber: 5,
+        axisLabel: {
+          show: true,
+          formatter: function (value) {
+            return `${(value / 1000).toFixed(2)}s`;
+          }
+        }
+      },
       series: [
         {
-          name: '轉速',
+          yAxisIndex: 0,
+          name: 'Torque',
           type: 'line',
-          stack: '轉速',
-          smooth: true,
-          data: this.rpm,
+          stack: 'Torque',
+          data: this.torque,
+          symbol: 'none',
+          smooth: true
         },
         {
-          yAxisIndex:1,
-          name: '扭力',
+          yAxisIndex: 1,
+          name: 'Speed',
           type: 'line',
-          stack: '扭力',
-          smooth: true,
-          data: this.torque,
-          markLine: {
-            data: [
-              {
-                yAxis: this.target,
-                name: '目標值'
-              }
-            ]
-          }
-        },
+          stack: 'Speed',
+          data: this.rpm,
+          symbol: 'none',
+          smooth: true
+        }
       ]
     }
+
+    // 單顆螺絲鎖完
     if (data.snStatus) {
-      this.sendLog.emit(data);
-      let payload = {
-        serialNumber: this.info.number,
-        data:data
+
+      let status = parseInt(data['snStatus']);
+      let report = parseInt(data['snReport']);
+      // 開啟警告提示
+      if (status === 2 && report > 0) {
+        this._state.openRemindError.next({ isOpen: true, message: data['snReport'] })
       }
+
+      // write to csv
+      data['nTorqueLowerLmt'] = data['nTorqueLowerLmt'] / 100;
+      data['nTorqueUpperLmt'] = data['nTorqueUpperLmt'] / 100;
+      data['snDirection'] = this.convertDirection(data['snDirection']);
+      data['snTorqueUnit'] = this.convertUnit(data['snTorqueUnit']);
+      data['snStatus'] = this.convertStatus(data['snStatus']);
+      data['snReport'] = this.convertReport(data['snReport']);
+      data['time'] = this.convertTimeFormat(data['time']);
+      delete data['timeStamp'];
+
+      this.showbar = this.info['number'];
+      this.showbarobj = this.info;
+
+      Object.assign(data, { serialNumber:this.info['number'] });
+
+      let payload = {
+        serialNumber: this.info['number'],
+        data: data
+      }
+      this._http.post('http://localhost:5001/screwdrive/data/write2csv', payload).subscribe();
       
-      this._http.post('http://10.101.100.179:5001/screwdrive/data/write2csv', payload)
-      .subscribe(res => {
-        console.log("success")
-      })
-      if (!data.nScrewLeft) {
-        this.socket.close();
-        this.finished.emit(true)
+      // 輸出 table
+      this.sendLog.emit(data);
+
+      // 整組螺絲鎖完
+      if (data.snFinish === 1) {
+        this.socket.disconnect();
+        this.finished.emit(true);
         this._state.finishedAlert.next(true);
+        this._http.post('http://localhost:5001/screwdrive/device/disable', { "disable": true }).subscribe();
+        return;
       }
       return;
     }
@@ -124,50 +192,127 @@ export class ChartsComponent implements OnInit {
       legend: {
         type: 'scroll',
         data: [{
-          name: '轉速',
+          name: 'Torque',
           icon: 'rect'
         }, {
-          name: '扭力',
+          name: 'Speed',
           icon: 'rect'
         }]
       },
-      tooltip: {
-        trigger: 'axis',
-        formatter: function (params) {
-          return "RPM: " + params[0]['data'].toFixed(2) + '<br>' + "Torque: " + params[1]['data'].toFixed(2);
-        }
-      },
       xAxis: {
-        type: 'category',
-        data: []
+        axisTick: {
+          show: true
+        },
+        splitLine: {
+          show: false
+        }
       },
       yAxis: [
         {
           type: 'value',
-          name: '轉速',
-          axisLabel: {
-            formatter: '{value} rpm'
-          }
-        },
-        {
-          id:1,
-          type: 'value',
-          name: '扭力',
-          min: 0,
-          max: 100,
-          interval: 20,
+          name: 'Torque',
           splitLine: {
             show: false
           },
           axisLabel: {
-            formatter: '{value}'
+            formatter: '{value} '
           }
-        }
+        },
+        {
+          type: 'value',
+          name: 'Speed',
+          axisLabel: {
+            formatter: '{value} '
+          }
+        },
       ],
-      series: [
-
-      ]
+      series: []
     };
+  }
+
+  convertDirection(value){
+    value = parseInt(value);
+    let text:string;
+    switch(value){
+      case 0:
+        text = "CW";
+        break;
+      case 1:
+        text = 'CCW';
+        break;
+    }
+    return text;
+  }
+
+  convertUnit(value){
+    value = parseInt(value)
+    let text:string;
+    switch(value){
+      case 0:
+        text = "kgf.cm";
+        break;
+      case 1:
+        text = 'N.m';
+        break;
+    }
+    return text;
+  }
+
+  convertStatus(value){
+    value = parseInt(value)
+    let text:string;
+    switch(value){
+      case 1:
+        text = "OK";
+        break;
+      case 2:
+        text = 'NG';
+        break;
+    }
+    return text;
+  }
+
+  convertReport(value){
+    value = parseInt(value)
+    let text: string;
+    switch (value) {
+      case 0:
+        text = "No Error";
+        break;
+      case 1:
+        text = "Stripped Screw";
+        break;
+      case 2:
+        text = 'Floating Lock';
+        break;
+      case 3:
+        text = 'Tighten Torque NG';
+        break;
+      case 4:
+        text = 'Tighten Angle NG';
+        break;
+      case 5:
+        text = 'Half Stop';
+        break;
+    }
+    return text;
+  }
+
+  convertTimeFormat(value){
+    let time = new Date(value);
+    let yy, MM, dd, HH, mm, ss;
+    yy = time.getFullYear();
+    MM = time.getMonth();
+    dd = time.getDate();
+    HH = time.getHours();
+    mm = time.getMinutes();
+    ss = time.getSeconds();
+
+    return `${yy}/${this.addzero(MM)}/${this.addzero(dd)} ${this.addzero(HH)}:${this.addzero(mm)}:${this.addzero(ss)}`
+  }
+
+  addzero(value){
+    return value < 10 ? `0${value}` : value;
   }
 
   ngOnDestroy() {

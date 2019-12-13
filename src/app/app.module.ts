@@ -4,6 +4,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { NgxLoadingModule } from 'ngx-loading';
+import { FileSaverModule } from 'ngx-filesaver';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -14,8 +15,10 @@ import { DeleteComponent } from './pages/delete/delete.component';
 import { TablesComponent } from './components/tables/tables.component';
 import { ChartsComponent } from './components/charts/charts.component';
 
-import { StatusPipe } from './status.pipe';
-import { ReportPipe } from './report.pipe';
+import { StatusPipe } from './pipes/status.pipe';
+import { ReportPipe } from './pipes/report.pipe';
+import { UnitPipe } from './pipes/unit.pipe';
+import { DirectionPipe } from './pipes/direction.pipe';
 
 @NgModule({
   declarations: [
@@ -26,7 +29,9 @@ import { ReportPipe } from './report.pipe';
     TablesComponent,
     ChartsComponent,
     StatusPipe,
-    ReportPipe
+    ReportPipe,
+    UnitPipe,
+    DirectionPipe
   ],
   imports: [
     BrowserModule,
@@ -34,7 +39,8 @@ import { ReportPipe } from './report.pipe';
     NgxEchartsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    NgxLoadingModule
+    NgxLoadingModule,
+    FileSaverModule
   ],
   providers: [],
   bootstrap: [AppComponent]

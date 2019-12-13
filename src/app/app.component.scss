@@ -3,7 +3,7 @@ a{
 }
 
 .content{
-    height: calc(100vh - 68px);
+    height: calc(100vh - 92px);
 }
 
 
@@ -23,7 +23,7 @@ a{
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 9;
-    width: 30%;
+    width: 40%;
     padding: 16px;
     border-radius: 6px;
     background: #fff;
@@ -75,4 +75,20 @@ a{
     right: 0;
     background: #bbb;
     z-index: 99;
+}
+
+.outter{
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.showAlert{
+    top: 5%;
+    z-index: 9999;
+}
+
+.gesture{
+    cursor: pointer;
 }

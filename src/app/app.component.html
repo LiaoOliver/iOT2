@@ -1,44 +1,81 @@
-<ngx-loading [show]="isWait" [config]="{primaryColour: '#FFD25A', secondaryColour: '#FFAA5A', tertiaryColour: '#FF785A', backdropBackgroundColour: 'rgba(0,0,0,0.8)'}"></ngx-loading>
+<ngx-loading [show]="!isWait"
+  [config]="{primaryColour: '#FFD25A', secondaryColour: '#FFAA5A', tertiaryColour: '#FF785A', backdropBackgroundColour: 'rgba(0,0,0,0.8)'}">
+</ngx-loading>
+<div class="showAlert position-absolute col-12" *ngIf="showAlert">
+  <div class="alert alert-danger d-flex justify-content-between">
+    <p class="mb-0"></p>
+    <p class="mb-0">Opps!!! The system connection is abnormal!!</p>
+    <p class="mb-0 gesture" (click)="closeAlert()">X</p>
+  </div>
+</div>
 <div class="w-100 p-3 bg-light d-flex justify-content-around">
   <div class="col-3 text-center position-relative" (click)="isActive = 0">
     <a [routerLink]="['/']" class="ishover d-inline-block">
       <img width="36" src="assets/icons/24px.svg">
     </a>
+    <div>Dashboard</div>
     <span [ngClass]="{bottomLine: isActive === 0}"></span>
   </div>
-  <div class="col-3 text-center" (click)="isActive = 1" [ngClass]="{'isDisabled': desabled}">
+  <div class="col-3 text-center" (click)="isActive = 1" [ngClass]="{'isDisabled': disabled}">
     <a [routerLink]="['/history']" class="ishover d-inline-block">
       <img width="36" src="assets/icons/history-solid.svg">
     </a>
+    <div>History Log</div>
     <span [ngClass]="{bottomLine: isActive === 1}"></span>
   </div>
-  <div class="col-3 text-center" (click)="isActive = 2" [ngClass]="{'isDisabled': desabled}">
+  <div class="col-3 text-center" (click)="isActive = 2" [ngClass]="{'isDisabled': disabled}">
     <a [routerLink]="['/delete']" class="ishover d-inline-block">
       <img width="36" src="assets/icons/trash.svg">
     </a>
+    <div>Delete</div>
     <span [ngClass]="{bottomLine: isActive === 2}"></span>
   </div>
-  <div class="col-3 text-center ishover" [ngClass]="{'isDisabled': desabled}">
+  <div class="col-3 text-center ishover" [ngClass]="{'isDisabled': disabled}">
     <a (click)="openSetPort()">
       <img width="36" src="assets/icons/cog-solid.svg">
     </a>
+    <div>Setting</div>
   </div>
 </div>
 <div class="content">
   <router-outlet></router-outlet>
 </div>
-
+<!-- 設定 comport -->
 <div *ngIf="toggleDialog">
   <div class="dialog"></div>
-  <div class="setting ">
-    <span class="closebtn" (click)="close()">X</span>
+  <!-- show setting dialog -->
+  <div class="setting " *ngIf="!remindError.isOpen">
+    <div *ngIf="alertMissPort" class="alert alert-danger font-weight-bold" role="alert">
+      The Port is not existing
+    </div>
+    <div *ngIf="alertConnect" class="alert alert-danger font-weight-bold" role="alert">
+      Please restart the connection exception.
+    </div>
+    <div *ngIf="!alertAuth" class="alert alert-danger font-weight-bold" role="alert">
+      This device is not authorized for use
+    </div>
+    <div class="closebtn" (click)="close()" [ngClass]="{'isDisabled': cancelDisabled}">X</div>
+    <!-- <div class="my-2">
+      <span class="mr-2">Device ID:</span>
+      <span class="font-weight-bolder">{{ deviceId }}</span>
+    </div> -->
     <form [formGroup]="selectedComPortForm" (ngSubmit)="setPort()" class="d-flex flex-column">
-      <label>請設定 COM-PORT</label>
-      <select formControlName="selected">
-        <option>請選擇 comport</option>
+      <label>Please set COM-PORT</label>
+      <select formControlName="selected" (click)="getComPort()">
+        <option>Please choose comport</option>
         <option *ngFor="let list of comPortList">{{ list }}</option>
       </select>
-      <button type="submit" class="btn btn-primary mt-3">確定</button>
+      <button type="submit" class="btn btn-primary mt-3">confirm</button>
     </form>
+  </div>
+</div>
+<!-- open remind error message -->
+<div class="position-absolute outter" *ngIf="remindError.isOpen">
+  <div class="dialog"></div>
+  <div class="setting">
+    <h4 class="text-danger">ERROR MESSAGE: {{ remindError.message | report }}</h4>
+    <h5>
+      Error! Stop screwing ,please change to unscrew(counterclockwise)mode to take out the screw and re-screw again.
+    </h5>
   </div>
 </div>

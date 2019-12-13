@@ -1,47 +1,45 @@
 <table id="table-data" class="h-100">
     <tr>
-      <th>Time</th>
-      <th>ElapsedTime</th>
-      <th>RPM</th>
-      <th>ScrewLeft</th>
-      <th>Station</th>
-      <th>TightAglLowerLmt</th>
-      <th>TightAglUpperLmt</th>
-      <th>TightAngle</th>
-      <th>Torque</th>
-      <th>TorqueLowerLmt</th>
-      <th>TorqueUpperLmt</th>
-      <th>TotalAglLowerLmt</th>
-      <th>TotalAglUpperLmt</th>
-      <th>TotalAngle</th>
-      <th>Direction</th>
-      <th>Finish</th>
-      <th>Report</th>
-      <th>Status</th>
-      <th>Temperature</th>
-      <th>TorqueUnit</th>
+      <th class="bg-light text-dark">Serial</th>
+      <th class="bg-light text-dark">Time</th>
+      <th class="bg-light text-dark">Lock Time</th>
+      <th class="bg-light text-dark">Screw Left</th>
+      <th class="bg-light text-dark">Finish</th>
+      <th style="background:#dfa800; color:#343a40;">Torque</th>
+      <th style="background:#ffc928; color:#343a40;">Torque<br>LLimit</th>
+      <th style="background:#ffc928; color:#343a40;">Torque<br>ULimit</th>
+      <th style="background:#ffc928; color:#343a40;">Torque<br>Unit</th>
+      <th style="background:#308d46">Lock<br>Angle</th>
+      <th class="bg-success">LockAngle<br>LLimit</th>
+      <th class="bg-success">LockAngle<br>ULimit</th>
+      <th style="background:#2375cd">Tight<br>Angle</th>
+      <th class="bg-primary">Tighten Angle<br>LLimit</th>
+      <th class="bg-primary">Tighten Angle<br>ULimit</th>
+      <th style="background:#1d8494">Direction</th>
+      <th class="bg-info">Fault<br> Reason</th>
+      <th class="bg-info">Status</th>
+      <th class="bg-info">Temp.</th>
     </tr>
     <tr *ngFor="let item of data">
-      <td>{{ item.time | date:'short' }}</td>
-      <td>{{ item.nElapsedTime }}</td>
-      <td>{{ item.nRPM }}</td>
-      <td>{{ item.nScrewLeft }}</td>
-      <td>{{ item.nStation }}</td>
-      <td>{{ item.nTightAglLowerLmt }}</td>
-      <td>{{ item.nTightAglUpperLmt }}</td>
-      <td>{{ item.nTightAngle }}</td>
-      <td>{{ item.nTorque }}</td>
-      <td>{{ item.nTorqueLowerLmt }}</td>
-      <td>{{ item.nTorqueUpperLmt }}</td>
-      <td>{{ item.nTotalAglLowerLmt }}</td>
-      <td>{{ item.nTotalAglUpperLmt }}</td>
-      <td>{{ item.nTotalAngle }}</td>
-      <td>{{ item.snDirection }}</td>
-      <td>{{ item.snFinish }}</td>
-      <td>{{ item.snReport | report }}</td>
-      <td>{{ item.snStatus | status }}</td>
-      <td>{{ item.snTemperature }}</td>
-      <td>{{ item.snTorqueUnit }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.serialNumber }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.time }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nElapsedTime }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nScrewLeft }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snFinish }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTorque }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTorqueLowerLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTorqueUpperLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snTorqueUnit }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTotalAngle }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTightAglLowerLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTightAglUpperLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTightAngle }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTotalAglLowerLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTotalAglUpperLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snDirection }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snReport }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snStatus }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snTemperature }}</td>
     </tr>
   </table>
 

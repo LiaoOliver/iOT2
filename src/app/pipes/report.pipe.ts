@@ -10,22 +10,22 @@ export class ReportPipe implements PipeTransform {
     let text: string;
     switch (value) {
       case 0:
-        text = "0";
+        text = "No Error";
         break;
       case 1:
-        text = "滑牙或螺絲過長";
+        text = "Stripped Screw";
         break;
       case 2:
-        text = '浮鎖或斜打';
+        text = 'Floating Lock';
         break;
       case 3:
-        text = '擰緊扭矩不良';
+        text = 'Tighten Torque NG';
         break;
       case 4:
-        text = '擰緊角度不良';
+        text = 'Tighten Angle NG';
         break;
       case 5:
-        text = '中途提前釋放啟動信號';
+        text = 'Half Stop';
         break;
     }
     return text;

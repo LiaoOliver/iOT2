@@ -10,10 +10,10 @@ export class StatusPipe implements PipeTransform {
     let text:string;
     switch(value){
       case 1:
-        text = "成功";
+        text = "OK";
         break;
       case 2:
-        text = '失敗';
+        text = 'NG';
         break;
     }
     return text;

@@ -1,33 +1,39 @@
 <div class="d-flex flex-column py-4">
   <div class="alert alert-danger col-4 position-absolute" role="alert" *ngIf="noDataAlert">
-    此區間查無資料
+      No information in this interval
   </div>
-  <form [formGroup]="historyForm" (ngSubmit)="onSubmit()" class="col-12">
+  <div class="col-12 mb-2" *ngIf="!checkInput">
+    <div class="alert-warning p-3 bor rounded">Please select a serial number or date!!</div>
+  </div>
+  <form [formGroup]="historyForm" (ngSubmit)="onSubmit()" class="col-12 mb-3">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text" id="basic-addon1">Serial Number</span>
       </div>
-      <select required formControlName="serialNumber" class="form-control">
-        <option value="">請選擇</option>
+      <input #serial type="text" class="form-control" formControlName="serialNumber"  (change)="checkValue($event)">
+      <!-- <select formControlName="serialNumber" class="form-control" (change)="checkValue($event)">
+        <option value="">Please choose one</option>
         <option *ngFor="let list of lists" [value]="list">{{ list }}</option>
-      </select>
+      </select> -->
     </div>
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text" id="basic-addon1">開始時間</span>
+        <span class="input-group-text" id="basic-addon1">Starting time</span>
       </div>
-      <input required type="date" class="form-control" formControlName="startDate">
+      <input type="date" class="form-control" formControlName="startDate"  (change)="checkValue($event)">
     </div>
     <div class="input-group mb-3">
       <div class="input-group-prepend">
-        <span class="input-group-text" id="basic-addon1">結束時間</span>
+        <span class="input-group-text" id="basic-addon1">End Time</span>
       </div>
-      <input required type="date" class="form-control" formControlName="endDate">
+      <input type="date" class="form-control" formControlName="endDate"  (change)="checkValue($event)">
     </div>
-    <button type="submit" class="btn btn-primary" [disabled]="!historyForm.valid">送出查詢</button>
+    <button type="submit" class="btn btn-primary" [disabled]="!checkInput">submit inquiry</button>
+    <!-- <button type="submit" class="btn btn-primary">submit inquiry</button> -->
+    <button class="btn btn-warning ml-3" (click)="print($event)">export to csv</button>
   </form>
 
-  <div class="col-12">
+  <div class="overflow-auto">
     <app-tables [data]="tableList"></app-tables>
   </div>
 </div>
