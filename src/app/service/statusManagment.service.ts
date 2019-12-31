@@ -17,14 +17,16 @@ export class StatusManagmentService {
   constructor(public _http:HttpClient) { }
 
   resetDisabled(){
-    this._http.post('http://localhost:5001/screwdrive/device/disable', {"disable":false}).subscribe(res => {console.log("success")})
+    this._http.post('http://localhost:5001/screwdrive/device/disable', {"disable":false}).subscribe(res => {
+      // console.log("success")
+    })
   }
 
   resetIndex(){
     this._http.post('http://localhost:5001/screwdrive/resetTime',{}).subscribe(res => {
-      console.log("reset success")
+      // console.log("reset success")
     }, error => {
-      console.log("error",error)
+      // console.log("error",error)
       this.connectSuccess.next(false)
     });
   }

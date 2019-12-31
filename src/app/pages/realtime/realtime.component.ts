@@ -31,21 +31,16 @@ export class RealtimeComponent implements OnInit {
   public count:number = 0;
   public interval;
   public closeStocket:boolean = false;
-  public showRemind:boolean = false;
-  public showBarCode;
-  
+  public showRemind:boolean = false;  
   public basicForm =  new FormGroup({
     number: new FormControl('')
   })
 
   @ViewChild('inputFoucs', { static: true }) input:ElementRef;
 
-  constructor(
-    private _status:StatusManagmentService
-  ) {}
+  constructor(private _status:StatusManagmentService) {}
 
   ngOnInit() {
-
     fromEvent<any>(window, 'mousedown').subscribe(res => this.counter());
     fromEvent<any>(window, 'mouseup').subscribe(res => this.clearCounter());
 
@@ -101,7 +96,6 @@ export class RealtimeComponent implements OnInit {
     let payload = this.basicForm.value;
     payload['number'] = this.input.nativeElement.value
     this.input.nativeElement.disabled = true;
-    this.showBarCode = payload['number'];
     this._status.resetIndex();
     this._status.resetDisabled();
     this._status.disabledOtherRouter.next(this.isConnect);

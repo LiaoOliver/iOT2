@@ -59,7 +59,7 @@ export class TablesComponent implements OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("tablesComponent:", this.data)
+    // console.log("tablesComponent:", this.data)
   }
 
 }

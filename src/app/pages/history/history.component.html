@@ -2,35 +2,35 @@
   <div class="alert alert-danger col-4 position-absolute" role="alert" *ngIf="noDataAlert">
       No information in this interval
   </div>
-  <div class="col-12 mb-2" *ngIf="!checkInput">
-    <div class="alert-warning p-3 bor rounded">Please select a serial number or date!!</div>
-  </div>
   <form [formGroup]="historyForm" (ngSubmit)="onSubmit()" class="col-12 mb-3">
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text" id="basic-addon1">Serial Number</span>
       </div>
-      <input #serial type="text" class="form-control" formControlName="serialNumber"  (change)="checkValue($event)">
-      <!-- <select formControlName="serialNumber" class="form-control" (change)="checkValue($event)">
-        <option value="">Please choose one</option>
-        <option *ngFor="let list of lists" [value]="list">{{ list }}</option>
-      </select> -->
+      <input #serial type="text" class="form-control" formControlName="serialNumber">
     </div>
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text" id="basic-addon1">Starting time</span>
       </div>
-      <input type="date" class="form-control" formControlName="startDate"  (change)="checkValue($event)">
+      <input type="date" class="form-control" formControlName="startDate">
     </div>
     <div class="input-group mb-3">
       <div class="input-group-prepend">
         <span class="input-group-text" id="basic-addon1">End Time</span>
       </div>
-      <input type="date" class="form-control" formControlName="endDate"  (change)="checkValue($event)">
+      <input type="date" class="form-control" formControlName="endDate">
     </div>
-    <button type="submit" class="btn btn-primary" [disabled]="!checkInput">submit inquiry</button>
-    <!-- <button type="submit" class="btn btn-primary">submit inquiry</button> -->
+    <div>
+      Data Sort by：
+      <span>
+        <label class="mr-3" for="origin"><input required class="mr-2" formControlName="isOrderByTime" value=false type="radio" name="origin" id="origin">SerialNumber</label>
+        <label for="time"><input required class="mr-2" formControlName="isOrderByTime" value=true type="radio" name="origin" id="time">Time</label>
+      </span>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="!historyForm.valid">submit inquiry</button>
     <button class="btn btn-warning ml-3" (click)="print($event)">export to csv</button>
+    <button class="btn btn-info ml-3" (click)="refresh($event)">refresh</button>
   </form>
 
   <div class="overflow-auto">

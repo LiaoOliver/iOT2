@@ -21,25 +21,25 @@
       <th class="bg-info">Temp.</th>
     </tr>
     <tr *ngFor="let item of data">
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.serialNumber }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.time }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nElapsedTime }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nScrewLeft }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snFinish }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTorque }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTorqueLowerLmt }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTorqueUpperLmt }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snTorqueUnit }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTotalAngle }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTightAglLowerLmt }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTightAglUpperLmt }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTightAngle }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTotalAglLowerLmt }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.nTotalAglUpperLmt }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snDirection }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snReport }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snStatus }}</td>
-      <td [ngClass]="{'background-fail': item.snStatus == 2}">{{ item.snTemperature }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.serialNumber }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.time }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nElapsedTime }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nScrewLeft }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.snFinish }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTorque }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTorqueLowerLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTorqueUpperLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.snTorqueUnit }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTotalAngle }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTightAglLowerLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTightAglUpperLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTightAngle }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTotalAglLowerLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.nTotalAglUpperLmt }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.snDirection }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.snReport }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.snStatus }}</td>
+      <td [ngClass]="{'background-fail': item.snStatus == 'NG'}">{{ item.snTemperature }}</td>
     </tr>
   </table>
 

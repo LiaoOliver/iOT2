@@ -23,13 +23,13 @@
     <div>History Log</div>
     <span [ngClass]="{bottomLine: isActive === 1}"></span>
   </div>
-  <div class="col-3 text-center" (click)="isActive = 2" [ngClass]="{'isDisabled': disabled}">
+  <!-- <div class="col-3 text-center" (click)="isActive = 2" [ngClass]="{'isDisabled': disabled}">
     <a [routerLink]="['/delete']" class="ishover d-inline-block">
       <img width="36" src="assets/icons/trash.svg">
     </a>
     <div>Delete</div>
     <span [ngClass]="{bottomLine: isActive === 2}"></span>
-  </div>
+  </div> -->
   <div class="col-3 text-center ishover" [ngClass]="{'isDisabled': disabled}">
     <a (click)="openSetPort()">
       <img width="36" src="assets/icons/cog-solid.svg">

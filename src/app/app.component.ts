@@ -131,7 +131,7 @@ export class AppComponent implements OnInit {
         this.toggleDialog = false;
         this.cancelDisabled = false;
       }, err => {
-        console.log(err)
+        // console.log(err)
       })
     } else {
       this.alertConnect = true;

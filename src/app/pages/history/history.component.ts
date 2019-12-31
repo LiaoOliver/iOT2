@@ -1,4 +1,4 @@
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FileSaverService } from 'ngx-filesaver';
@@ -15,11 +15,11 @@ export class HistoryComponent implements OnInit {
   public historyForm = new FormGroup({
     serialNumber: new FormControl(''),
     startDate: new FormControl(''),
-    endDate: new FormControl('')
+    endDate: new FormControl(''),
+    isOrderByTime: new FormControl('',Validators.required)
   })
   public tableList;
   public lists: string[] = []
-  public checkInput: boolean = false;
 
   @ViewChild('serial', { static: true }) serial:ElementRef;
 
@@ -30,7 +30,6 @@ export class HistoryComponent implements OnInit {
 
   ngOnInit(): void {
     this._http.get('http://localhost:5001/screwdrive/data/serialNum').subscribe((res: any) => {
-      console.log(res)
       if (res.result === null || !res.result.length) return this.lists = ['not data'];
       this.lists = res.result
     }, error => {
@@ -44,29 +43,41 @@ export class HistoryComponent implements OnInit {
     payload['serialNumber'] = this.serial.nativeElement.value;
     let date = new Date().toLocaleDateString();
     payload = { "fileName": date, ...payload }
-    this._http.post('http://10.101.100.134:5001/screwdrive/data/csvExport', payload, { observe: 'response', responseType: 'blob' }).subscribe(res => {
+    this._http.post('http://localhost:5001/screwdrive/data/csvExport', payload, { observe: 'response', responseType: 'blob' }).subscribe(res => {
       const blobValue = new Blob([res['body']], { type: 'text/csv' });
       this._fileSave.save(blobValue, `${date}.csv`);
     })
   }
 
-  checkValue(e): void {
-    if (e.target.value) this.checkInput = true;
+  refresh(e){
+    e.preventDefault();
+    this.tableList = []
   }
   
   onSubmit(): void {
     let payload = this.historyForm.value;
     payload['serialNumber'] = this.serial.nativeElement.value;
-    this._http.post('http://10.101.100.134:5001/screwdrive/data/history', payload).subscribe((res: any) => {
+    payload['isOrderByTime'] =  payload['isOrderByTime'] === 'true' ? true : false;
+    
+    
+    this._http.post('http://localhost:5001/screwdrive/data/history', payload).subscribe((res: any) => {
       let response = [];
-      if (!res.result) {
+      // 回傳無資料
+      if(res['result'] === null){
         this.noDataAlert = true;
         setTimeout(() => {
           this.noDataAlert = false;
         }, 2500)
-      };
-      for (let objKey in res.result) { response = [...res.result[objKey], ...response] }
-      this.tableList = response;
+      }
+      if(payload['isOrderByTime']){
+        // 時間排序
+        // console.log('response', res)
+        this.tableList = res['result'];
+      }else{
+        // 序號排序
+        for (let objKey in res.result) { response = [...res.result[objKey], ...response] }
+        this.tableList = response;
+      }
     })
   }
 }

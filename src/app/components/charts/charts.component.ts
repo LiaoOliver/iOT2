@@ -19,8 +19,6 @@ export class ChartsComponent implements OnInit {
   private time = [];
   private preStatus: number = 0;
   private curStatus: number = 0;
-  public showbar;
-  public showbarobj;
 
   @Input() closeStocket: boolean = false;
   @Input() isConnect: boolean;
@@ -68,7 +66,7 @@ export class ChartsComponent implements OnInit {
       _this.preStatus = _this.curStatus;
       _this.curStatus = data.snStatus;
       // 每執行完一顆螺絲 重設
-      if ((_this.preStatus == 0 && _this.curStatus == 1) || (_this.preStatus == 0 && _this.curStatus == 2)) {
+      if ((_this.preStatus == 1 && _this.curStatus == 0) || (_this.preStatus == 2 && _this.curStatus == 0)) {
         _this.clearChart()
         return;
       }
@@ -97,9 +95,13 @@ export class ChartsComponent implements OnInit {
 
     if(data.snTorqueUnit === 0) {
       data.nTorque = (parseFloat(data.nTorque)/100).toFixed(2);
+      data['nTorqueLowerLmt'] = data['nTorqueLowerLmt'] / 100;
+      data['nTorqueUpperLmt'] = data['nTorqueUpperLmt'] / 100;
     }
     if(data.snTorqueUnit === 1) {
       data.nTorque = (parseInt(data.nTorque) / 1000).toFixed(2);
+      data['nTorqueLowerLmt'] = data['nTorqueLowerLmt'] / 1000;
+      data['nTorqueUpperLmt'] = data['nTorqueUpperLmt'] / 1000;
     }
 
     let time = data.timeStamp * 1000;
@@ -151,17 +153,12 @@ export class ChartsComponent implements OnInit {
       }
 
       // write to csv
-      data['nTorqueLowerLmt'] = data['nTorqueLowerLmt'] / 100;
-      data['nTorqueUpperLmt'] = data['nTorqueUpperLmt'] / 100;
       data['snDirection'] = this.convertDirection(data['snDirection']);
       data['snTorqueUnit'] = this.convertUnit(data['snTorqueUnit']);
       data['snStatus'] = this.convertStatus(data['snStatus']);
       data['snReport'] = this.convertReport(data['snReport']);
       data['time'] = this.convertTimeFormat(data['time']);
       delete data['timeStamp'];
-
-      this.showbar = this.info['number'];
-      this.showbarobj = this.info;
 
       Object.assign(data, { serialNumber:this.info['number'] });
 
@@ -302,12 +299,11 @@ export class ChartsComponent implements OnInit {
     let time = new Date(value);
     let yy, MM, dd, HH, mm, ss;
     yy = time.getFullYear();
-    MM = time.getMonth();
+    MM = time.getMonth()+1;
     dd = time.getDate();
     HH = time.getHours();
     mm = time.getMinutes();
     ss = time.getSeconds();
-
     return `${yy}/${this.addzero(MM)}/${this.addzero(dd)} ${this.addzero(HH)}:${this.addzero(mm)}:${this.addzero(ss)}`
   }
 
