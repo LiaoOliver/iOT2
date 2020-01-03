@@ -11,6 +11,8 @@ import { StatusManagmentService } from './service/statusManagment.service';
 export class AppComponent implements OnInit {
   title = 'project';
 
+  public tokenAlert: boolean = false;
+  public tokenMessage: string;
   public token: string;
   public alertMissPort: boolean = false;
   public alertAuth: boolean = true;
@@ -25,6 +27,8 @@ export class AppComponent implements OnInit {
   public disabled: boolean;
   public throwError: boolean = true;
   public toggleDialog: boolean = false;
+  public tokenString: string;
+  public actualString: string;
   public selectedComPortForm = new FormGroup({
     selected: new FormControl(''),
   })
@@ -56,11 +60,13 @@ export class AppComponent implements OnInit {
     this.showAlert = true;
   }
 
+  // 確認是否有跟螺絲起子連線
   checkConnect() {
     this._http.get('http://localhost:5001/screwdrive/heartbeat').subscribe((res: any) => {
       this.isWait = res.result
       this.toggleDialog = true;
       if (res.result) {
+        // PORT 設定
         this.checkComPortStatus();
         this.getComPort();
       } else {
@@ -71,11 +77,13 @@ export class AppComponent implements OnInit {
     })
   }
 
+  // 開啟 SETTING 視窗
   openSetPort() {
     this.toggleDialog = !this.toggleDialog;
     this.getComPort();
   }
 
+  // 取得 PORT 號
   getComPort() {
     setTimeout(() => {
       this._http.get('http://localhost:5001/screwdrive/com/info').subscribe((res: any) => {
@@ -93,41 +101,43 @@ export class AppComponent implements OnInit {
     })
   }
 
+  // 送出 PORT 設定
   setPort() {
     let port = this.selectedComPortForm.value['selected'];
     this._http.post('http://localhost:5001/screwdrive/com/setPortNum ', { "port": port }).subscribe(
       (res: any) => {
-        this.setScrewdrive(res)
+        // 設定完 PORT 取得產品 key
+        this.getToken().subscribe(token => {
+          this.tokenString = token['result']
+          this.getDeviceId().subscribe(device => {
+            this.actualString = device['result'];
+            if(token['result'] === device['result']){
+              // 送訊號給螺絲起子
+              this.setScrewdrive(res)
+            }else{
+              this.tokenAlert = true;
+              this.tokenMessage = 'Permission denied'
+            }
+          }, error => {
+            this.tokenAlert = true;
+            // this.tokenMessage = error
+            this.tokenMessage = 'Device ID is invalid'
+          })
+        }, error => {
+          this.tokenAlert = true;
+          // this.tokenMessage = error
+          this.tokenMessage = 'Token is invalid'
+        })
       }, error => {
         this.alertMissPort = true;
       }
     )
   }
 
-  getDevice() {
-    this.getDeviceId().subscribe(id => {
-      this.deviceId = id['result'];
-      this.toggleDialog = false;
-      // this.cancelDisabled = false;
-      // this.alertAuth = true;
-      // this.alertMissPort = false;
-      // this.alertConnect = false;
-      // this.getToken().subscribe(token => {
-      //   if(id['result']===token['result']){
-      //       // 授權成功 設定 comport
-      //     }else{
-      //       this.cancelDisabled = true;
-      //       this.alertAuth = false;
-      //     }              
-      // })
-    });
-  }
-
   // 開啟螺絲起子
   setScrewdrive(res) {
     if (res.result === 'Successful') {
       this._http.post('http://localhost:5001/screwdrive/com/open', { "open": true }).subscribe(res => {
-        // this.getDevice();
         this.toggleDialog = false;
         this.cancelDisabled = false;
       }, err => {

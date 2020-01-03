@@ -8,6 +8,13 @@
     <p class="mb-0 gesture" (click)="closeAlert()">X</p>
   </div>
 </div>
+<div class="showAlert position-absolute col-12" *ngIf="tokenAlert">
+  <div class="alert alert-danger d-flex justify-content-between">
+    <p class="mb-0"></p>
+    <p class="mb-0">{{ tokenMessage }}</p>
+    <p class="mb-0 gesture" (click)="closeAlert()">X</p>
+  </div>
+</div>
 <div class="w-100 p-3 bg-light d-flex justify-content-around">
   <div class="col-3 text-center position-relative" (click)="isActive = 0">
     <a [routerLink]="['/']" class="ishover d-inline-block">
@@ -55,10 +62,18 @@
       This device is not authorized for use
     </div>
     <div class="closebtn" (click)="close()" [ngClass]="{'isDisabled': cancelDisabled}">X</div>
-    <!-- <div class="my-2">
-      <span class="mr-2">Device ID:</span>
-      <span class="font-weight-bolder">{{ deviceId }}</span>
-    </div> -->
+    <div class="my-2">
+      <div>
+        <span class="mr-2">Expected Device ID:</span>
+        <!-- token key -->
+        <span class="font-weight-bolder">{{ tokenString }}</span>
+      </div>
+      <div>
+        <span class="mr-2">Actual Device ID:</span>
+        <!-- deviceId key -->
+        <span class="font-weight-bolder">{{ actualString }}</span>
+      </div>
+    </div>
     <form [formGroup]="selectedComPortForm" (ngSubmit)="setPort()" class="d-flex flex-column">
       <label>Please set COM-PORT</label>
       <select formControlName="selected" (click)="getComPort()">
