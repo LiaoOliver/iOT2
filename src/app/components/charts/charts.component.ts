@@ -2,6 +2,7 @@ import { Component, OnInit, Input, SimpleChanges, Output, EventEmitter } from '@
 import { HttpClient } from '@angular/common/http';
 import { StatusManagmentService } from '../../service/statusManagment.service';
 import * as io from 'socket.io-client';
+import * as FileSaver from 'file-saver'
 
 @Component({
   selector: 'app-charts',
@@ -10,8 +11,9 @@ import * as io from 'socket.io-client';
 })
 export class ChartsComponent implements OnInit {
 
-  options: any;
+  public options: any;
   public updateOptions: any;
+  public echartsInstance: any;
   private timer: any;
   private socket;
   private rpm = [];
@@ -19,6 +21,7 @@ export class ChartsComponent implements OnInit {
   private time = [];
   private preStatus: number = 0;
   private curStatus: number = 0;
+  private filename;
 
   @Input() closeStocket: boolean = false;
   @Input() isConnect: boolean;
@@ -35,9 +38,7 @@ export class ChartsComponent implements OnInit {
   ngOnChanges(changes: SimpleChanges): void {
     if (this.closeStocket) {
       this.socket.disconnect();
-      this._http.post('http://localhost:5001/screwdrive/device/disable', { "disable": true }).subscribe(res => {
-        // console.log("success")
-      })
+      this._http.post('http://localhost:5001/screwdrive/device/disable', { "disable": true }).subscribe(res => { })
       setTimeout(() => {
         this.closeStocket = false;
       }, 1000);
@@ -55,8 +56,24 @@ export class ChartsComponent implements OnInit {
     }
   }
 
+  onChartInit(e: any) {
+    this.echartsInstance = e;
+  }
+
+  saveChartImage() {
+    let image = this.echartsInstance.getDataURL({
+      type: 'png',
+      pixelRatio: 1,
+      backgroundColor: '#fff'
+    })
+    FileSaver.saveAs(image, `${this.filename}.png`);
+  }
+
   ngOnInit() {
     this.drawChart();
+    this._state.download$.subscribe(res => {
+      this.saveChartImage()
+    })
   }
 
   listenSocket() {
@@ -93,12 +110,12 @@ export class ChartsComponent implements OnInit {
     }
     if (data.nRPM === undefined) return;
 
-    if(data.snTorqueUnit === 0) {
-      data.nTorque = (parseFloat(data.nTorque)/100).toFixed(2);
+    if (data.snTorqueUnit === 0) {
+      data.nTorque = (parseFloat(data.nTorque) / 100).toFixed(2);
       data['nTorqueLowerLmt'] = data['nTorqueLowerLmt'] / 100;
       data['nTorqueUpperLmt'] = data['nTorqueUpperLmt'] / 100;
     }
-    if(data.snTorqueUnit === 1) {
+    if (data.snTorqueUnit === 1) {
       data.nTorque = (parseInt(data.nTorque) / 1000).toFixed(2);
       data['nTorqueLowerLmt'] = data['nTorqueLowerLmt'] / 1000;
       data['nTorqueUpperLmt'] = data['nTorqueUpperLmt'] / 1000;
@@ -108,7 +125,15 @@ export class ChartsComponent implements OnInit {
     this.time.push(time);
     this.rpm.push(data.nRPM);
     this.torque.push(data.nTorque);
+
     this.updateOptions = {
+      toolbox: {
+        feature: {
+          saveAsImage: {
+            name: `${data['time']}`
+          }
+        }
+      },
       xAxis: {
         type: 'category',
         data: this.time,
@@ -144,14 +169,13 @@ export class ChartsComponent implements OnInit {
 
     // 單顆螺絲鎖完
     if (data.snStatus) {
-
       let status = parseInt(data['snStatus']);
       let report = parseInt(data['snReport']);
       // 開啟警告提示
       if (status === 2 && report > 0) {
         this._state.openRemindError.next({ isOpen: true, message: data['snReport'] })
       }
-
+      
       // write to csv
       data['snDirection'] = this.convertDirection(data['snDirection']);
       data['snTorqueUnit'] = this.convertUnit(data['snTorqueUnit']);
@@ -159,15 +183,16 @@ export class ChartsComponent implements OnInit {
       data['snReport'] = this.convertReport(data['snReport']);
       data['time'] = this.convertTimeFormat(data['time']);
       delete data['timeStamp'];
+      this.filename = data['time'];
 
-      Object.assign(data, { serialNumber:this.info['number'] });
+      Object.assign(data, { serialNumber: this.info['number'] });
 
       let payload = {
         serialNumber: this.info['number'],
         data: data
       }
       this._http.post('http://localhost:5001/screwdrive/data/write2csv', payload).subscribe();
-      
+
       // 輸出 table
       this.sendLog.emit(data);
 
@@ -176,7 +201,9 @@ export class ChartsComponent implements OnInit {
         this.socket.disconnect();
         this.finished.emit(true);
         this._state.finishedAlert.next(true);
-        this._http.post('http://localhost:5001/screwdrive/device/disable', { "disable": true }).subscribe();
+        this._http.post('http://localhost:5001/screwdrive/device/disable', { "disable": true }).subscribe(res => {
+          this._state.reset$.next();
+        });
         return;
       }
       return;
@@ -195,6 +222,13 @@ export class ChartsComponent implements OnInit {
           name: 'Speed',
           icon: 'rect'
         }]
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {
+            title: '下載'
+          }
+        }
       },
       xAxis: {
         axisTick: {
@@ -227,10 +261,10 @@ export class ChartsComponent implements OnInit {
     };
   }
 
-  convertDirection(value){
+  convertDirection(value) {
     value = parseInt(value);
-    let text:string;
-    switch(value){
+    let text: string;
+    switch (value) {
       case 0:
         text = "CW";
         break;
@@ -241,10 +275,10 @@ export class ChartsComponent implements OnInit {
     return text;
   }
 
-  convertUnit(value){
+  convertUnit(value) {
     value = parseInt(value)
-    let text:string;
-    switch(value){
+    let text: string;
+    switch (value) {
       case 0:
         text = "kgf.cm";
         break;
@@ -255,10 +289,10 @@ export class ChartsComponent implements OnInit {
     return text;
   }
 
-  convertStatus(value){
+  convertStatus(value) {
     value = parseInt(value)
-    let text:string;
-    switch(value){
+    let text: string;
+    switch (value) {
       case 1:
         text = "OK";
         break;
@@ -269,7 +303,7 @@ export class ChartsComponent implements OnInit {
     return text;
   }
 
-  convertReport(value){
+  convertReport(value) {
     value = parseInt(value)
     let text: string;
     switch (value) {
@@ -295,11 +329,11 @@ export class ChartsComponent implements OnInit {
     return text;
   }
 
-  convertTimeFormat(value){
+  convertTimeFormat(value) {
     let time = new Date(value);
     let yy, MM, dd, HH, mm, ss;
     yy = time.getFullYear();
-    MM = time.getMonth()+1;
+    MM = time.getMonth() + 1;
     dd = time.getDate();
     HH = time.getHours();
     mm = time.getMinutes();
@@ -307,7 +341,7 @@ export class ChartsComponent implements OnInit {
     return `${yy}/${this.addzero(MM)}/${this.addzero(dd)} ${this.addzero(HH)}:${this.addzero(mm)}:${this.addzero(ss)}`
   }
 
-  addzero(value){
+  addzero(value) {
     return value < 10 ? `0${value}` : value;
   }
 

@@ -1,9 +1,12 @@
 <div class="d-flex flex-column">
-  <div class="alert alert-danger col-4 position-absolute" role="alert" *ngIf="stopAlert">
+  <div class="alert alert-danger text-center col-4 position-absolute" role="alert" *ngIf="stopAlert">
     Connect Interrupt
   </div>
-  <div class="alert alert-success col-4 position-absolute" role="alert" *ngIf="showConnectAlert">
+  <div class="alert alert-success text-center col-4 position-absolute" role="alert" *ngIf="showConnectAlert">
     Connected
+  </div>
+  <div class="alert alert-danger text-center col-4 position-absolute" role="alert" *ngIf="charLengthAlert">
+    Opps!!! The Serial Number Length is invalid!! Try Again!! The length must be {{ curLength }} 
   </div>
   <div class="alert alert-success col-4 position-absolute" role="alert" *ngIf="finishedAlert">
     The job has been completed, please press the reset and proceed to the next round
@@ -21,7 +24,7 @@
         (finished)="ableReset()"></app-charts>
     </div>
     <div class="col-4 p-3">
-      <form [formGroup]="basicForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="basicForm" (ngSubmit)="onSubmit($event)">
         <div class="input-group mb-3">
           <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">Serial Number</span>
@@ -29,8 +32,7 @@
           <input required type="text" class="form-control" formControlName="number" #inputFoucs>
         </div>
         <div class="d-flex justify-content-around position-relative">
-          <button type="submit" class="btn btn-info"
-          *ngIf="toggleBtn" [disabled]="!basicForm.valid && !auth">Start Connect</button>
+          <button type="submit" class="btn btn-info" *ngIf="toggleBtn" [disabled]="!basicForm.valid && !auth">Start Connect</button>
           <button type="button" class="btn btn-warning" *ngIf="!toggleBtn" (click)="reset()" [disabled]="enabledReset">Reset</button>
         </div>
       </form>

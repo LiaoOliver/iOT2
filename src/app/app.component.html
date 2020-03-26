@@ -80,6 +80,8 @@
         <option>Please choose comport</option>
         <option *ngFor="let list of comPortList">{{ list }}</option>
       </select>
+      <label for="setting" class="mt-2">Setting Character Length</label>
+      <input formControlName="length" type="number" class="form-control" id="setting">
       <button type="submit" class="btn btn-primary mt-3">confirm</button>
     </form>
   </div>
@@ -92,5 +94,6 @@
     <h5>
       Error! Stop screwing ,please change to unscrew(counterclockwise)mode to take out the screw and re-screw again.
     </h5>
+    <button class="btn btn-warning" (click)="download()">download</button>
   </div>
 </div>

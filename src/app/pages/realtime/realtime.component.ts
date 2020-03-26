@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { StatusManagmentService } from '../../service/statusManagment.service';
 import { fromEvent, Observable, Subscription } from 'rxjs';
 
@@ -10,6 +11,7 @@ import { fromEvent, Observable, Subscription } from 'rxjs';
 })
 export class RealtimeComponent implements OnInit {
 
+  public charLengthAlert:boolean = false;
   public finishedAlert:boolean = false;
   public showConnectAlert:boolean = false;
   public stopAlert:boolean = false;
@@ -32,13 +34,14 @@ export class RealtimeComponent implements OnInit {
   public interval;
   public closeStocket:boolean = false;
   public showRemind:boolean = false;  
+  public curLength:number;
   public basicForm =  new FormGroup({
     number: new FormControl('')
   })
 
   @ViewChild('inputFoucs', { static: true }) input:ElementRef;
 
-  constructor(private _status:StatusManagmentService) {}
+  constructor(private _status:StatusManagmentService, public _http:HttpClient) {}
 
   ngOnInit() {
     fromEvent<any>(window, 'mousedown').subscribe(res => this.counter());
@@ -70,6 +73,9 @@ export class RealtimeComponent implements OnInit {
         },2000)
       }
     })
+    this._status.reset$.subscribe(res=>{
+      this.reset();
+    })
   }
 
   counter(){
@@ -81,10 +87,10 @@ export class RealtimeComponent implements OnInit {
         this.count = 0;
         this.clearCounter();
       }
-    },3000);
+    },4000);
   }
 
-  clearCounter(){
+  clearCounter(): void{
     clearInterval(this.interval);
   }
 
@@ -92,21 +98,39 @@ export class RealtimeComponent implements OnInit {
     this.listenElement = this.input.nativeElement
   }
 
-  onSubmit(){
+  onSubmit(event){
+    event.preventDefault();
     let payload = this.basicForm.value;
-    payload['number'] = this.input.nativeElement.value
-    this.input.nativeElement.disabled = true;
-    this._status.resetIndex();
-    this._status.resetDisabled();
-    this._status.disabledOtherRouter.next(this.isConnect);
-    this.info = payload;
-    this.isConnect = true;
-    this.stopAndReset = false;
-    this.enabledReset = true;
-    this.toggleBtn = false;
+    payload['number'] = this.input.nativeElement.value;
+
+    // 檢查字元長度
+    this._status.getCharLengthSetting().subscribe(length => {
+      if(payload['number'].length === length['result']){
+        this.input.nativeElement.disabled = true;
+        this._status.resetIndex();
+        this._status.resetDisabled();
+        this._status.disabledOtherRouter.next(this.isConnect);
+        this.info = payload;
+        this.isConnect = true;
+        // 用觸動重置
+        this.stopAndReset = false;
+        // 重置按鈕
+        this.enabledReset = true;
+        // 控制 start connect 按鈕
+        this.toggleBtn = false;
+      }else{
+        this.basicForm.reset();
+        this.input.nativeElement.focus();
+        this.charLengthAlert = true;
+        this.curLength = length['result'];
+        setTimeout(()=>{
+          this.charLengthAlert = false;
+        },2000)
+      }
+    })
   }
 
-  reset(){
+  reset(): void{
     // 關閉連線
     this.closeStocket = true;
     // 關閉訊息
@@ -143,14 +167,14 @@ export class RealtimeComponent implements OnInit {
     this._status.resetIndex();
   }
 
-  ableReset(){
+  ableReset(): void{
     this.enabledReset = !this.enabledReset;
     this.stopAndReset = false;
   }
 
   cancel(){ this.showRemind = false }
 
-  stopConnect(e){
+  stopConnect(e): void{
     e.preventDefault();
     this.toggleBtn = true;
     this.reset();

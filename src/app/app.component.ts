@@ -29,9 +29,7 @@ export class AppComponent implements OnInit {
   public toggleDialog: boolean = false;
   public tokenString: string;
   public actualString: string;
-  public selectedComPortForm = new FormGroup({
-    selected: new FormControl(''),
-  })
+  public selectedComPortForm;
   public remindError:{isOpen:boolean, message:any};
 
   constructor(
@@ -50,6 +48,13 @@ export class AppComponent implements OnInit {
     this._status.disabledOtherRouter.subscribe(res => {
       this.disabled = res
     })
+    // 初始化選單
+    this._status.getCharLengthSetting().subscribe(length => {
+      this.selectedComPortForm = new FormGroup({
+        selected: new FormControl(''),
+        length:new FormControl(length['result'])
+      })
+    })
   }
 
   closeAlert(){
@@ -58,6 +63,10 @@ export class AppComponent implements OnInit {
 
   errorExit() {
     this.showAlert = true;
+  }
+
+  download(): void{
+    this._status.download$.next()
   }
 
   // 確認是否有跟螺絲起子連線
@@ -104,7 +113,8 @@ export class AppComponent implements OnInit {
   // 送出 PORT 設定
   setPort() {
     let port = this.selectedComPortForm.value['selected'];
-    this._http.post('http://localhost:5001/screwdrive/com/setPortNum ', { "port": port }).subscribe(
+    let length = this.selectedComPortForm.value['length'];
+    this._http.post('http://localhost:5001/screwdrive/com/setPortNum ', { "port": port, "charLength":length }).subscribe(
       (res: any) => {
         // 設定完 PORT 取得產品 key
         this.getToken().subscribe(token => {

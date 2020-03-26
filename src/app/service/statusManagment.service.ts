@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -7,27 +7,30 @@ import { HttpClient } from '@angular/common/http';
 })
 export class StatusManagmentService {
 
-  public connectSuccess = new BehaviorSubject(false);
-  public disabledOtherRouter = new BehaviorSubject(false);
-  public finishedAlert = new BehaviorSubject(false);
-  public focus = new BehaviorSubject(false);
-  public auth = new BehaviorSubject(true);
+  public connectSuccess:BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public disabledOtherRouter:BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public finishedAlert:BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public focus:BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public auth:BehaviorSubject<boolean> = new BehaviorSubject(true);
   public openRemindError = new BehaviorSubject({ isOpen: false, message:""});
+  public reset$:Subject<any> = new Subject();
+  public download$:Subject<any> = new Subject();
 
   constructor(public _http:HttpClient) { }
 
   resetDisabled(){
-    this._http.post('http://localhost:5001/screwdrive/device/disable', {"disable":false}).subscribe(res => {
-      // console.log("success")
-    })
+    this._http.post('http://localhost:5001/screwdrive/device/disable', {"disable":false}).subscribe()
   }
 
   resetIndex(){
     this._http.post('http://localhost:5001/screwdrive/resetTime',{}).subscribe(res => {
-      // console.log("reset success")
     }, error => {
-      // console.log("error",error)
       this.connectSuccess.next(false)
     });
+  }
+
+  // 取得字元設定長度
+  getCharLengthSetting(){
+    return this._http.get('http://localhost:5001/screwdrive/charLength')
   }
 }
